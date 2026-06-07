@@ -11,8 +11,8 @@ class PHENIXLauncher(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("🔥 PHENIX Launcher")
-        self.setGeometry(400, 200, 600, 700)
+        self.setWindowTitle("🔥 PHENIX Launcher v2.0")
+        self.setGeometry(400, 150, 650, 800)
         self.setStyleSheet("background-color: #0a0a1a; color: #00ff88;")
 
         self.processes = {}
@@ -20,8 +20,8 @@ class PHENIXLauncher(QMainWindow):
         main_widget = QWidget()
         self.setCentralWidget(main_widget)
         layout = QVBoxLayout(main_widget)
-        layout.setSpacing(15)
-        layout.setContentsMargins(30, 30, 30, 30)
+        layout.setSpacing(10)
+        layout.setContentsMargins(20, 20, 20, 20)
 
         # ロゴ
         logo = QLabel("🔥 PHENIX")
@@ -30,16 +30,15 @@ class PHENIXLauncher(QMainWindow):
         layout.addWidget(logo)
 
         subtitle = QLabel("Autonomous Distributed Antenna System")
-        subtitle.setStyleSheet("font-size: 14px; color: #666666;")
+        subtitle.setStyleSheet("font-size: 13px; color: #666666;")
         subtitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(subtitle)
 
-        version = QLabel("v3.2 - 2026")
-        version.setStyleSheet("font-size: 12px; color: #444444;")
+        version = QLabel("v4.0 - 2026 | Phase 7 Complete")
+        version.setStyleSheet("font-size: 11px; color: #444444;")
         version.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(version)
 
-        # 区切り線
         line = QFrame()
         line.setFrameShape(QFrame.Shape.HLine)
         line.setStyleSheet("color: #00ff88;")
@@ -52,8 +51,8 @@ class PHENIXLauncher(QMainWindow):
                 background-color: #003300;
                 color: #00ff88;
                 border: 3px solid #00ff88;
-                padding: 20px;
-                font-size: 20px;
+                padding: 15px;
+                font-size: 18px;
                 font-weight: bold;
                 border-radius: 10px;
             }
@@ -65,32 +64,47 @@ class PHENIXLauncher(QMainWindow):
 
         # 個別起動ボタン
         apps_group = QGroupBox("個別起動")
-        apps_group.setStyleSheet("QGroupBox { color: #00ff88; border: 1px solid #333333; padding: 10px; font-size: 14px; }")
+        apps_group.setStyleSheet(
+            "QGroupBox { color: #00ff88; border: 1px solid #333333;"
+            "padding: 10px; font-size: 13px; }"
+        )
         apps_layout = QVBoxLayout()
 
-        # Command Center
-        btn_cc = QPushButton("🖥️ Command Center v3.2")
-        btn_cc.setStyleSheet(self.get_btn_style('#00ff88'))
-        btn_cc.clicked.connect(lambda: self.launch_app('phenix_main.py', 'Command Center'))
-        apps_layout.addWidget(btn_cc)
+        apps = [
+            ("🖥️ Command Center v3.2",     '#00ff88', 'command_center.py',      'Command Center'),
+            ("🗺️ マップビューア",            '#ffaa00', 'map_viewer.py',          'Map Viewer'),
+            ("📊 データ分析ツール",           '#ff66ff', 'data_analyzer.py',       'Data Analyzer'),
+            ("🌡️ 生存者検知",               '#ff4444', 'survivor_detection.py',  'Survivor Detection'),
+            ("📐 三角測量システム",           '#00ffff', 'triangulation.py',       'Triangulation'),
+            ("📡 レーダー検知",              '#66ff66', 'radar_detection.py',     'Radar Detection'),
+            ("📡 TDOAシステム",             '#ff9900', 'tdoa_system.py',         'TDOA'),
+            ("🚁 Phase 6・7シミュレーター",  '#aa66ff', 'phase67_simulator.py',   'Phase67'),
+            ("🎬 自動デモモード",            '#ffff00', 'phenix_demo.py',         'Demo'),
+            ("✈️ QGroundControl",          '#aaaaaa', None,                     'QGroundControl'),
+        ]
 
-        # Map Viewer
-        btn_map = QPushButton("🗺️ マップビューア")
-        btn_map.setStyleSheet(self.get_btn_style('#00aaff'))
-        btn_map.clicked.connect(lambda: self.launch_app('map_viewer.py', 'Map Viewer'))
-        apps_layout.addWidget(btn_map)
-
-        # Data Analyzer
-        btn_data = QPushButton("📊 データ分析ツール")
-        btn_data.setStyleSheet(self.get_btn_style('#ffaa00'))
-        btn_data.clicked.connect(lambda: self.launch_app('data_analyzer.py', 'Data Analyzer'))
-        apps_layout.addWidget(btn_data)
-
-        # QGroundControl
-        btn_qgc = QPushButton("✈️ QGroundControl")
-        btn_qgc.setStyleSheet(self.get_btn_style('#ff66ff'))
-        btn_qgc.clicked.connect(self.launch_qgc)
-        apps_layout.addWidget(btn_qgc)
+        for text, color, script, name in apps:
+            btn = QPushButton(text)
+            btn.setStyleSheet(f"""
+                QPushButton {{
+                    background-color: #111122;
+                    color: {color};
+                    border: 2px solid {color};
+                    padding: 8px;
+                    font-size: 12px;
+                    border-radius: 5px;
+                    text-align: left;
+                }}
+                QPushButton:hover {{ background-color: #222244; }}
+                QPushButton:pressed {{ background-color: {color}; color: #000000; }}
+            """)
+            if script:
+                btn.clicked.connect(
+                    lambda checked, s=script, n=name: self.launch_app(s, n)
+                )
+            else:
+                btn.clicked.connect(self.launch_qgc)
+            apps_layout.addWidget(btn)
 
         apps_group.setLayout(apps_layout)
         layout.addWidget(apps_group)
@@ -103,7 +117,7 @@ class PHENIXLauncher(QMainWindow):
                 color: #ff4444;
                 border: 2px solid #ff4444;
                 padding: 10px;
-                font-size: 16px;
+                font-size: 15px;
                 border-radius: 5px;
             }
             QPushButton:hover { background-color: #550000; }
@@ -114,34 +128,22 @@ class PHENIXLauncher(QMainWindow):
 
         # ステータス
         self.status_label = QLabel("✅ 待機中")
-        self.status_label.setStyleSheet("font-size: 14px; color: #00ff88;")
+        self.status_label.setStyleSheet("font-size: 13px; color: #00ff88;")
         self.status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(self.status_label)
 
         # ログ
         self.log_text = QTextEdit()
-        self.log_text.setStyleSheet("background-color: #050510; color: #00ff88; font-family: monospace; font-size: 11px;")
+        self.log_text.setStyleSheet(
+            "background-color: #050510; color: #00ff88;"
+            "font-family: monospace; font-size: 11px;"
+        )
         self.log_text.setReadOnly(True)
-        self.log_text.setMaximumHeight(120)
+        self.log_text.setMaximumHeight(100)
         layout.addWidget(self.log_text)
 
-        self.log("🔥 PHENIX Launcher 起動！")
+        self.log("🔥 PHENIX Launcher v2.0 起動！")
         self.log("「全システム起動」で全部一気に起動します")
-
-    def get_btn_style(self, color):
-        return f"""
-            QPushButton {{
-                background-color: #111122;
-                color: {color};
-                border: 2px solid {color};
-                padding: 12px;
-                font-size: 14px;
-                border-radius: 5px;
-                text-align: left;
-            }}
-            QPushButton:hover {{ background-color: #222244; }}
-            QPushButton:pressed {{ background-color: {color}; color: #000000; }}
-        """
 
     def log(self, message):
         timestamp = datetime.now().strftime("%H:%M:%S")
@@ -153,20 +155,19 @@ class PHENIXLauncher(QMainWindow):
                 if self.processes[name].poll() is None:
                     self.log(f"⚠️ {name} はすでに起動中です")
                     return
-            except:
+            except Exception:
                 pass
 
         phenix_dir = os.path.expanduser("~/PHENIX")
-        process = subprocess.Popen(
-            ['python3', script],
-            cwd=phenix_dir
-        )
+        process = subprocess.Popen(['python3', script], cwd=phenix_dir)
         self.processes[name] = process
         self.log(f"✅ {name} 起動！")
         self.status_label.setText(f"✅ {name} 起動中")
 
     def launch_qgc(self):
-        qgc_path = os.path.expanduser("~/ダウンロード/QGroundControl-x86_64.AppImage")
+        qgc_path = os.path.expanduser(
+            "~/ダウンロード/QGroundControl-x86_64.AppImage"
+        )
         if os.path.exists(qgc_path):
             process = subprocess.Popen([qgc_path, '--no-sandbox'])
             self.processes['QGroundControl'] = process
@@ -178,10 +179,21 @@ class PHENIXLauncher(QMainWindow):
         self.log("🚀 全システム起動開始！")
         self.btn_all.setText("🚀 起動中...")
 
-        self.launch_app('phenix_main.py', 'Command Center')
-        QTimer.singleShot(1000, lambda: self.launch_app('map_viewer.py', 'Map Viewer'))
-        QTimer.singleShot(2000, lambda: self.launch_app('data_analyzer.py', 'Data Analyzer'))
+        apps = [
+            ('command_center.py',    'Command Center'),
+            ('map_viewer.py',        'Map Viewer'),
+            ('data_analyzer.py',     'Data Analyzer'),
+            ('radar_detection.py',   'Radar Detection'),
+            ('tdoa_system.py',       'TDOA'),
+            ('phase67_simulator.py', 'Phase67'),
+        ]
 
+        for i, (script, name) in enumerate(apps):
+            QTimer.singleShot(i * 800, lambda s=script, n=name: self.launch_app(s, n))
+
+        QTimer.singleShot(len(apps) * 800, self.all_launched)
+
+    def all_launched(self):
         self.log("✅ 全システム起動完了！")
         self.status_label.setText("✅ 全システム稼働中")
         self.btn_all.setText("🚀 全システム起動")
@@ -191,7 +203,7 @@ class PHENIXLauncher(QMainWindow):
             try:
                 process.terminate()
                 self.log(f"⛔ {name} 停止")
-            except:
+            except Exception:
                 pass
         self.processes = {}
         self.status_label.setText("⛔ 全システム停止")
