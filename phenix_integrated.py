@@ -43,7 +43,7 @@ class ThermalSimulator:
         hot_mask = (frame > threshold).astype(np.uint8)
         contours, _ = cv2.findContours(hot_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         for contour in contours:
-            if cv2.contourArea(contour) > 10:
+            if cv2.contourArea(contour) > 0:
                 M = cv2.moments(contour)
                 if M["m00"] > 0:
                     cx = int(M["m10"] / M["m00"])
