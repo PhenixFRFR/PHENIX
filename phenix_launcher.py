@@ -8,13 +8,11 @@ from PyQt6.QtGui import *
 
 
 class PHENIXLauncher(QMainWindow):
-
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("🔥 PHENIX Launcher v2.0")
-        self.setGeometry(400, 150, 650, 800)
+        self.setWindowTitle("🔥 PHENIX Launcher v3.0")
+        self.setGeometry(400, 150, 650, 950)
         self.setStyleSheet("background-color: #0a0a1a; color: #00ff88;")
-
         self.processes = {}
 
         main_widget = QWidget()
@@ -34,7 +32,7 @@ class PHENIXLauncher(QMainWindow):
         subtitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(subtitle)
 
-        version = QLabel("v4.0 - 2026 | Phase 7 Complete")
+        version = QLabel("v3.0 - 2026 | Phase 7 Complete")
         version.setStyleSheet("font-size: 11px; color: #444444;")
         version.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(version)
@@ -62,52 +60,106 @@ class PHENIXLauncher(QMainWindow):
         self.btn_all.clicked.connect(self.launch_all)
         layout.addWidget(self.btn_all)
 
-        # 個別起動ボタン
-        apps_group = QGroupBox("個別起動")
-        apps_group.setStyleSheet(
-            "QGroupBox { color: #00ff88; border: 1px solid #333333;"
-            "padding: 10px; font-size: 13px; }"
+        # ── コアシステム ──
+        core_group = QGroupBox("🔥 コアシステム")
+        core_group.setStyleSheet(
+            "QGroupBox { color: #00ff88; border: 2px solid #00ff88;"
+            "padding: 10px; font-size: 13px; font-weight: bold; margin-top: 6px; }"
+            "QGroupBox::title { subcontrol-origin: margin; left: 10px; }"
         )
-        apps_layout = QVBoxLayout()
+        core_layout = QVBoxLayout()
 
-        apps = [
-            ("🖥️ Command Center v3.2",     '#00ff88', 'command_center.py',      'Command Center'),
-            ("🗺️ マップビューア",            '#ffaa00', 'map_viewer.py',          'Map Viewer'),
-            ("📊 データ分析ツール",           '#ff66ff', 'data_analyzer.py',       'Data Analyzer'),
-            ("🌡️ 生存者検知",               '#ff4444', 'survivor_detection.py',  'Survivor Detection'),
-            ("📐 三角測量システム",           '#00ffff', 'triangulation.py',       'Triangulation'),
-            ("📡 レーダー検知",              '#66ff66', 'radar_detection.py',     'Radar Detection'),
-            ("📡 TDOAシステム",             '#ff9900', 'tdoa_system.py',         'TDOA'),
-            ("🚁 Phase 6・7シミュレーター",  '#aa66ff', 'phase67_simulator.py',   'Phase67'),
-            ("🎬 自動デモモード",            '#ffff00', 'phenix_demo.py',         'Demo'),
-            ("✈️ QGroundControl",          '#aaaaaa', None,                     'QGroundControl'),
+        core_apps = [
+            ("🖥️ Command Center v3.2", '#00ff88', 'phenix_main.py', 'Command Center'),
+            ("🗺️ マップビューア",        '#ffaa00', 'map_viewer.py',   'Map Viewer'),
+            ("📊 データ分析ツール",       '#ff66ff', 'data_analyzer.py','Data Analyzer'),
         ]
+        for text, color, script, name in core_apps:
+            btn = self._make_btn(text, color, script, name)
+            core_layout.addWidget(btn)
 
-        for text, color, script, name in apps:
-            btn = QPushButton(text)
-            btn.setStyleSheet(f"""
-                QPushButton {{
-                    background-color: #111122;
-                    color: {color};
-                    border: 2px solid {color};
-                    padding: 8px;
-                    font-size: 12px;
-                    border-radius: 5px;
-                    text-align: left;
-                }}
-                QPushButton:hover {{ background-color: #222244; }}
-                QPushButton:pressed {{ background-color: {color}; color: #000000; }}
-            """)
-            if script:
-                btn.clicked.connect(
-                    lambda checked, s=script, n=name: self.launch_app(s, n)
-                )
-            else:
-                btn.clicked.connect(self.launch_qgc)
-            apps_layout.addWidget(btn)
+        core_group.setLayout(core_layout)
+        layout.addWidget(core_group)
 
-        apps_group.setLayout(apps_layout)
-        layout.addWidget(apps_group)
+        # ── ミッション管理 ──
+        mission_group = QGroupBox("🗂️ ミッション管理")
+        mission_group.setStyleSheet(
+            "QGroupBox { color: #00aaff; border: 2px solid #00aaff;"
+            "padding: 10px; font-size: 13px; font-weight: bold; margin-top: 6px; }"
+            "QGroupBox::title { subcontrol-origin: margin; left: 10px; }"
+        )
+        mission_layout = QVBoxLayout()
+
+        mission_apps = [
+            ("🗺️ ミッションプランナー", '#00aaff', 'mission_planner.py', 'Mission Planner'),
+            ("📋 ミッションレポート",   '#66ffff', 'mission_report.py',  'Mission Report'),
+        ]
+        for text, color, script, name in mission_apps:
+            btn = self._make_btn(text, color, script, name)
+            mission_layout.addWidget(btn)
+
+        mission_group.setLayout(mission_layout)
+        layout.addWidget(mission_group)
+
+        # ── 検知・センサー ──
+        sensor_group = QGroupBox("📡 検知・センサー")
+        sensor_group.setStyleSheet(
+            "QGroupBox { color: #ff66ff; border: 2px solid #ff66ff;"
+            "padding: 10px; font-size: 13px; font-weight: bold; margin-top: 6px; }"
+            "QGroupBox::title { subcontrol-origin: margin; left: 10px; }"
+        )
+        sensor_layout = QVBoxLayout()
+
+        sensor_apps = [
+            ("🌡️ 生存者検知",       '#ff4444', 'survivor_detections.py','Survivor Detection'),
+            ("📐 三角測量システム", '#00ffff', 'triangulation.py',       'Triangulation'),
+            ("📡 レーダー検知",     '#66ff66', 'radar_detection.py',     'Radar Detection'),
+            ("📡 TDOAシステム",     '#ff9900', 'tdoa_system.py',         'TDOA'),
+        ]
+        for text, color, script, name in sensor_apps:
+            btn = self._make_btn(text, color, script, name)
+            sensor_layout.addWidget(btn)
+
+        sensor_group.setLayout(sensor_layout)
+        layout.addWidget(sensor_group)
+
+        # ── 通知・モニタリング ──
+        notify_group = QGroupBox("🔔 通知・モニタリング")
+        notify_group.setStyleSheet(
+            "QGroupBox { color: #ffaa00; border: 2px solid #ffaa00;"
+            "padding: 10px; font-size: 13px; font-weight: bold; margin-top: 6px; }"
+            "QGroupBox::title { subcontrol-origin: margin; left: 10px; }"
+        )
+        notify_layout = QVBoxLayout()
+
+        notify_apps = [
+            ("🔊 音声アラート",       '#ffaa00', 'voice_alert.py',      'Voice Alert'),
+            ("🌐 Webダッシュボード",  '#ff6600', 'web_dashboard.py',    'Web Dashboard'),
+            ("🚁 Phase6・7シミュレーター", '#aa66ff', 'phase67_simulator.py','Phase67'),
+        ]
+        for text, color, script, name in notify_apps:
+            btn = self._make_btn(text, color, script, name)
+            notify_layout.addWidget(btn)
+
+        notify_group.setLayout(notify_layout)
+        layout.addWidget(notify_group)
+
+        # ── 外部ツール ──
+        ext_group = QGroupBox("✈️ 外部ツール")
+        ext_group.setStyleSheet(
+            "QGroupBox { color: #aaaaaa; border: 1px solid #555555;"
+            "padding: 10px; font-size: 13px; margin-top: 6px; }"
+            "QGroupBox::title { subcontrol-origin: margin; left: 10px; }"
+        )
+        ext_layout = QVBoxLayout()
+
+        btn_qgc = QPushButton("✈️ QGroundControl")
+        btn_qgc.setStyleSheet(self._btn_style('#aaaaaa'))
+        btn_qgc.clicked.connect(self.launch_qgc)
+        ext_layout.addWidget(btn_qgc)
+
+        ext_group.setLayout(ext_layout)
+        layout.addWidget(ext_group)
 
         # 全停止ボタン
         self.btn_stop_all = QPushButton("⛔ 全システム停止")
@@ -142,12 +194,34 @@ class PHENIXLauncher(QMainWindow):
         self.log_text.setMaximumHeight(100)
         layout.addWidget(self.log_text)
 
-        self.log("🔥 PHENIX Launcher v2.0 起動！")
+        self.log("🔥 PHENIX Launcher v3.0 起動！")
         self.log("「全システム起動」で全部一気に起動します")
+
+    # ── ヘルパー ───────────────────────────────────
+
+    def _btn_style(self, color):
+        return (
+            f"QPushButton {{"
+            f"background-color: #111122; color: {color};"
+            f"border: 2px solid {color}; padding: 8px;"
+            f"font-size: 12px; border-radius: 5px; text-align: left; }}"
+            f"QPushButton:hover {{ background-color: #222244; }}"
+            f"QPushButton:pressed {{ background-color: {color}; color: #000000; }}"
+        )
+
+    def _make_btn(self, text, color, script, name):
+        btn = QPushButton(text)
+        btn.setStyleSheet(self._btn_style(color))
+        btn.clicked.connect(lambda checked, s=script, n=name: self.launch_app(s, n))
+        return btn
+
+    # ── ログ ───────────────────────────────────────
 
     def log(self, message):
         timestamp = datetime.now().strftime("%H:%M:%S")
         self.log_text.append(f"[{timestamp}] {message}")
+
+    # ── 起動・停止 ─────────────────────────────────
 
     def launch_app(self, script, name):
         if name in self.processes:
@@ -180,14 +254,17 @@ class PHENIXLauncher(QMainWindow):
         self.btn_all.setText("🚀 起動中...")
 
         apps = [
-            ('command_center.py',    'Command Center'),
-            ('map_viewer.py',        'Map Viewer'),
-            ('data_analyzer.py',     'Data Analyzer'),
-            ('radar_detection.py',   'Radar Detection'),
-            ('tdoa_system.py',       'TDOA'),
-            ('phase67_simulator.py', 'Phase67'),
+            ('phenix_main.py',      'Command Center'),
+            ('mission_planner.py',  'Mission Planner'),
+            ('mission_report.py',   'Mission Report'),
+            ('voice_alert.py',      'Voice Alert'),
+            ('web_dashboard.py',    'Web Dashboard'),
+            ('map_viewer.py',       'Map Viewer'),
+            ('data_analyzer.py',    'Data Analyzer'),
+            ('radar_detection.py',  'Radar Detection'),
+            ('tdoa_system.py',      'TDOA'),
+            ('phase67_simulator.py','Phase67'),
         ]
-
         for i, (script, name) in enumerate(apps):
             QTimer.singleShot(i * 800, lambda s=script, n=name: self.launch_app(s, n))
 
